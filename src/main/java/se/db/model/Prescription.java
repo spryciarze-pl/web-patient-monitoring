@@ -8,12 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "prescriptions", schema = "public")
-@Data
 public class Prescription {
 
     @Id
@@ -36,7 +35,10 @@ public class Prescription {
     @Column(name = "prescription_time", columnDefinition = "timestamp without time zone")
     private LocalDateTime prescriptionTime;
 
+    // Constructors, getters, and setters
+
     public Prescription() {
+        // Default constructor
     }
 
     public Prescription(Integer doctorId, Integer patientId, String medicine) {
@@ -46,4 +48,47 @@ public class Prescription {
         this.prescriptionTime = LocalDateTime.now();
     }
 
+    // Getter and setter methods for all fields
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Integer doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public Integer getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(Integer patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getMedicine() {
+        return medicine;
+    }
+
+    public void setMedicine(String medicine) {
+        this.medicine = medicine;
+    }
+
+    public LocalDateTime getPrescriptionTime() {
+        return prescriptionTime;
+    }
+
+    public void setPrescriptionTime(LocalDateTime prescriptionTime) {
+        this.prescriptionTime = prescriptionTime;
+    }
+
+    // toString, hashCode, equals, etc. methods can also be overridden if needed
 }

@@ -6,11 +6,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
 @Entity
 @Table(name = "passwords", schema = "public")
-@Data
 public class Password {
 
     @Id
@@ -21,10 +19,26 @@ public class Password {
     private String hashedPassword;
 
     public Password() {
+        // Default constructor
     }
 
     public Password(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getHashedPassword() {
+        return hashedPassword;
+    }
+
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+    }
 }
