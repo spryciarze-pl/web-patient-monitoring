@@ -1,38 +1,43 @@
 package se.db.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "specializations")
+@Table(name = "specializations", schema = "public")
 public class Specialization {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
+    @NotBlank
+    @Size(max = 32)
     private String name;
 
     private String description;
 
-    // Constructors, getters, and setters
-
-    // Default constructor
     public Specialization() {
+        // Default constructor
     }
 
-    // Parameterized constructor
     public Specialization(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
-    // Getters and setters
+    // Getter and setter methods for all fields
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -51,4 +56,6 @@ public class Specialization {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    // toString, hashCode, equals, etc. methods can also be overridden if needed
 }
