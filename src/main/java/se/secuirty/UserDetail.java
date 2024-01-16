@@ -39,6 +39,7 @@ public class UserDetail implements UserDetailsService {
     public UserDetails loadUserByUsername(String mail) {
 
 
+        //qweqwe
         User user = userRepository.findByMail(mail);
         Password password = passwordRepository.findById(user.getPasswordId());
         Role role = roleRepository.findById(user.getRoleId());
@@ -46,8 +47,6 @@ public class UserDetail implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(mail);
         }
-
-        org.springframework.security.core.userdetails.User usr = new org.springframework.security.core.userdetails.User(user.getMail(), password.getHashedPassword(), authorities);
 
         return new org.springframework.security.core.userdetails.User(user.getMail(), passwordEncoder.encode(password.getHashedPassword()), authorities);
     }
