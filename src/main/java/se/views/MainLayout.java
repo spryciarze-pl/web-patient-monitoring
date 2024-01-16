@@ -23,9 +23,7 @@ public class MainLayout extends AppLayout {
     @Autowired
     private SecurityService securityService;
     private H2 viewTitle;
-
     private Button logoutButton;
-
 
     public MainLayout(SecurityService securityService) {
         this.securityService = securityService;
