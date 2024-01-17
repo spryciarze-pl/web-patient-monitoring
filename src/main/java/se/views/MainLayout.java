@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
@@ -73,5 +74,16 @@ public class MainLayout extends AppLayout {
         layout.add(logoutButton);
 
         return layout;
+    }
+
+    private String getCurrentPageTitle() {
+        return getContent().getClass().getAnnotation(PageTitle.class).value();
+    }
+    @Override
+    protected void afterNavigation() {
+        super.afterNavigation();
+
+        // Set the view title in the header
+        viewTitle.setText(getCurrentPageTitle());
     }
 }
