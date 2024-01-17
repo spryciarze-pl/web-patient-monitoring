@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 import se.secuirty.SecurityService;
 import se.views.about.AboutView;
+import se.views.activity.ActivityView;
 import se.views.panel.PanelView;
 import se.views.profile.ProfileView;
 
@@ -56,8 +57,8 @@ public class MainLayout extends AppLayout {
         SideNav nav = new SideNav();
 
         nav.addItem(new SideNavItem("Main panel", PanelView.class, LineAwesomeIcon.HOSPITAL.create()));
+        nav.addItem(new SideNavItem("Activity", ActivityView.class, LineAwesomeIcon.FEATHER_ALT_SOLID.create()));
         nav.addItem(new SideNavItem("Profile", ProfileView.class, LineAwesomeIcon.ADDRESS_BOOK.create()));
-        nav.addItem(new SideNavItem("Activity", AboutView.class, LineAwesomeIcon.FEATHER_ALT_SOLID.create()));
         nav.addItem(new SideNavItem("Appointments", AboutView.class, LineAwesomeIcon.CALENDAR.create()));
         nav.addItem(new SideNavItem("Prescriptions", AboutView.class, LineAwesomeIcon.BELL.create()));
         nav.addItem(new SideNavItem("Notifications", AboutView.class, LineAwesomeIcon.ENVELOPE.create()));
