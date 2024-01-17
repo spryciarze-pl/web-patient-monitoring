@@ -57,8 +57,8 @@ public class MainLayout extends AppLayout {
         SideNav nav = new SideNav();
 
         nav.addItem(new SideNavItem("Main panel", PanelView.class, LineAwesomeIcon.HOSPITAL.create()));
-        nav.addItem(new SideNavItem("Activity", ActivityView.class, LineAwesomeIcon.FEATHER_ALT_SOLID.create()));
         nav.addItem(new SideNavItem("Profile", ProfileView.class, LineAwesomeIcon.ADDRESS_BOOK.create()));
+        nav.addItem(new SideNavItem("Activity", ActivityView.class, LineAwesomeIcon.FEATHER_ALT_SOLID.create()));
         nav.addItem(new SideNavItem("Appointments", AboutView.class, LineAwesomeIcon.CALENDAR.create()));
         nav.addItem(new SideNavItem("Prescriptions", AboutView.class, LineAwesomeIcon.BELL.create()));
         nav.addItem(new SideNavItem("Notifications", AboutView.class, LineAwesomeIcon.ENVELOPE.create()));
