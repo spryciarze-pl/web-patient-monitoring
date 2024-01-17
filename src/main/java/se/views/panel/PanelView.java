@@ -43,7 +43,7 @@ public class PanelView extends VerticalLayout {
         button.addClickListener(event -> {
             List<Specialization> list = specializationRepository.findAll();
 
-            System.out.println("CHUJ");
+            System.out.println("Test");
         });
 
         add(button);
