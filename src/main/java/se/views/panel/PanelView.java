@@ -13,9 +13,6 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.db.model.Specialization;
-import se.db.repository.AssignmentRepository;
-import se.db.repository.DoctorsActivityRepository;
-import se.db.repository.PatientsActivityRepository;
 import se.db.repository.SpecializationRepository;
 import se.secuirty.SecurityService;
 import se.views.MainLayout;
@@ -35,30 +32,13 @@ import java.util.List;
 @Route(value = "", layout = MainLayout.class)
 public class PanelView extends VerticalLayout {
 
-    @Autowired
-    private SpecializationRepository specializationRepository;
-
-    @Autowired
-    AssignmentRepository assignmentRepository;
-    @Autowired
-    PatientsActivityRepository patientsActivityRepository;
-    @Autowired
-    DoctorsActivityRepository doctorsActivityRepository;
-
-    @Autowired
-    private SecurityService securityService;
-
-
     private VerticalLayout leftSideLayout;
     private VerticalLayout rightSideLayout;
 
-    private VerticalLayout leftSide;
-    private VerticalLayout doctorDetailsLayout;
-
-    private VerticalLayout activitySelectorLayout;
-    private VerticalLayout rightSide;
-
-
+    @Autowired
+    private SpecializationRepository specializationRepository;
+    @Autowired
+    private SecurityService securityService;
 
     public PanelView(SecurityService securityService) {
         this.securityService = securityService;
@@ -198,7 +178,7 @@ public class PanelView extends VerticalLayout {
         rightSideLayout.add(activityGridHeading, activityGrid);
 
         // Main Layout
-        H2 header = new H2("Hello " + securityService.getAuthenticatedUser().getUser().getName());
+        H2 header = new H2("Hello " + securityService.getAuthenticatedUser().getUsername());
         header.addClassName("H1");
 
         // Use a HorizontalLayout to organize the left and right side layouts
