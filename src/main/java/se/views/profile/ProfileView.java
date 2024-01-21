@@ -9,10 +9,12 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import se.secuirty.SecurityService;
 import se.views.MainLayout;
+
 @PermitAll
 @PageTitle("Profile")
 @Route(value = "profile", layout = MainLayout.class)
 public class ProfileView extends VerticalLayout {
+
     public ProfileView(SecurityService securityService) {
         setWidth("min-content");
         H3 h3 = new H3("Name: ");

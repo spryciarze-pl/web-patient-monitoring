@@ -6,7 +6,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
-import se.secuirty.UserDetail;
+import se.secuirty.UserDetailsService;
 
 @Route("login")
 @PageTitle("Login")
@@ -14,7 +14,7 @@ import se.secuirty.UserDetail;
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     @Autowired
-    UserDetail userDetail;
+    UserDetailsService userDetailsService;
 
     private LoginForm login = new LoginForm();
 
@@ -28,7 +28,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         login.setAction("login");
 
         login.addLoginListener(event -> {
-            userDetail.loadUserByUsername(event.getUsername());
+            userDetailsService.loadUserByUsername(event.getUsername());
         });
 
         add(new H1("Test Application"), login);
