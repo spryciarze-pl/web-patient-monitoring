@@ -11,9 +11,16 @@ import jakarta.annotation.security.RolesAllowed;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
+import org.springframework.stereotype.Service;
+import se.db.model.Appointment;
 import se.db.model.User;
+import se.db.repository.AppointmentRepository;
+import se.secuirty.SecurityService;
 import se.views.MainLayout;
 
 @PageTitle("Appointments")
@@ -22,14 +29,27 @@ import se.views.MainLayout;
 @Uses(Icon.class)
 public class AppointmentsView extends Composite<VerticalLayout> {
 
-    public AppointmentsView() {
-        Grid basicGrid = new Grid(/*temporary*/AppointmentData.class);
+    @Autowired
+    AppointmentRepository appointmentRepository;
+
+    @Autowired
+    SecurityService securityService;
+
+    public AppointmentsView(AppointmentRepository appointmentRepository, SecurityService securityService) {
+        this.appointmentRepository = appointmentRepository;
+        this.securityService = securityService;
+        Grid basicGrid = new Grid( /* temporary */ AppointmentData.class);
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         basicGrid.setWidth("100%");
         basicGrid.getStyle().set("flex-grow", "0");
         SetGridSampleData(basicGrid);
         getContent().add(basicGrid);
+
+        /*temporary*/
+        Integer id = securityService.getAuthenticatedUser().getUser().getId();
+        List<Appointment> list = appointmentRepository.findByDoctorId(72);
+        Integer test = 12;
     }
 
     /* temporary */

@@ -22,9 +22,9 @@ public class Appointment {
     @Column(name = "patient_id", nullable = false)
     private Integer patientId;
 
-    @Enumerated(EnumType.STRING)
+
     @Column(name = "type", nullable = false)
-    private AppointmentTypeEnum type;
+    private String type;
 
     @Column(name = "description", length = 128)
     private String description;
