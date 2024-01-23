@@ -2,304 +2,210 @@ package se.views.panel;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import se.db.model.DoctorsActivity;
-import se.db.model.Prescription;
-import se.db.model.User;
-import se.db.service.DbService;
-import se.dto.DoctorsActivityDto;
-import se.enums.DoctorsActivityEnum;
-import se.security.SecurityService;
-import se.utils.MedioUtils;
+import se.db.model.Specialization;
+import se.db.repository.AssignmentRepository;
+import se.db.repository.DoctorsActivityRepository;
+import se.db.repository.PatientsActivityRepository;
+import se.db.repository.SpecializationRepository;
+import se.secuirty.SecurityService;
 import se.views.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import java.util.Arrays; //to delete later
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.textfield.TextField;
+
+
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import se.views.panel.dialogs.*;
-
-
 import java.util.List;
 
 @PermitAll
-@PageTitle("Main Pannel")
+@PageTitle("Hello World")
 @Route(value = "", layout = MainLayout.class)
 public class PanelView extends VerticalLayout {
-    @Autowired
-    SecurityService securityService;
 
     @Autowired
-    DbService dbService;
+    private SpecializationRepository specializationRepository;
 
-    private User currentUser;
+    @Autowired
+    AssignmentRepository assignmentRepository;
+    @Autowired
+    PatientsActivityRepository patientsActivityRepository;
+    @Autowired
+    DoctorsActivityRepository doctorsActivityRepository;
 
-    private HorizontalLayout mainContainerLayout;
+    @Autowired
+    private SecurityService securityService;
+
+
     private VerticalLayout leftSideLayout;
-    private VerticalLayout detailsLayout;
-    private VerticalLayout activitySelectorLayout;
-    private HorizontalLayout activityDetailsLayout;
     private VerticalLayout rightSideLayout;
 
+    private VerticalLayout leftSide;
+    private VerticalLayout doctorDetailsLayout;
 
-    public PanelView(SecurityService securityService, DbService dbService) {
+    private VerticalLayout activitySelectorLayout;
+    private VerticalLayout rightSide;
 
-        this.dbService = dbService;
-        this.currentUser = securityService.getAuthenticatedUser().getUser();
-        prepareView();
 
-        add(mainContainerLayout);
 
-        switch (currentUser.getRoleId()) {
-            case 1:
-                createAdminView();
-                break;
-            case 2:
-                createDoctorView();
-                break;
-            case 3:
-                createPatientView();
-                break;
-        }
-    }
+    public PanelView(SecurityService securityService) {
+        this.securityService = securityService;
 
-    private void prepareView() {
+        // Left Side Layout
         leftSideLayout = new VerticalLayout();
-        leftSideLayout.setWidth("30%");
-        leftSideLayout.setHeightFull();
+        leftSideLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
 
+        H2 mainDoctorHeading = new H2("Main Doctor");
+        mainDoctorHeading.addClassName("H2");
+
+        H3 nameSurnameLabel = new H3("Name and Surname");
+        H3 specializationLabel = new H3("Specialization");
+
+        H2 selectActivityHeading = new H2("Select Activity");
+        selectActivityHeading.addClassName("H2");
+
+        ComboBox<String> activityComboBox = new ComboBox<>();
+        activityComboBox.setItems("Measure temperature", "Measure pressure");
+        // Set up the ComboBox content here
+        // Dialog setup
+        Dialog activityDialog = new Dialog();
+        activityDialog.setWidth("30em");
+        activityDialog.setHeight("20em");
+
+        // Add a value change listener to the ComboBox
+        activityComboBox.addValueChangeListener(event -> {
+            // Clear existing content
+            activityDialog.removeAll();
+
+            // Check the selected item and add content accordingly
+            if ("Measure temperature".equals(event.getValue())) {
+                // Measure temperature content
+                H2 measureTemperatureHeading = new H2("Measure temperature");
+                measureTemperatureHeading.addClassName("H2");
+
+                TextField temperatureInput = new TextField();
+                temperatureInput.setWidth("5em"); // Set the width to 10 em
+                temperatureInput.setLabel(null); // Remove the label
+                temperatureInput.setPlaceholder("Input"); // Add a placeholder text if needed
+                temperatureInput.getStyle().set("font-size", "1.5em"); // Adjust the font size as needed
+
+                H2 celsiusSymbol = new H2("°C");
+                celsiusSymbol.getStyle().set("font-size", "2.3em"); // Adjust the font size as needed
+
+                Button cancelButton = new Button("Cancel", e -> activityDialog.close());
+                Button sendButton = new Button("Send", e -> System.out.println("Send"));
+
+                cancelButton.getStyle().set("background-color", "#C33F23");
+                cancelButton.getStyle().set("color", "white");
+                cancelButton.getStyle().set("font-size", "1.5em"); // Adjust the font size as needed
+                cancelButton.setWidth("6em"); // Adjust the width as needed
+
+                sendButton.getStyle().set("font-size", "1.5em"); // Adjust the font size as needed
+                sendButton.getElement().getStyle().set("margin-left", "auto");
+                sendButton.setWidth("6em"); // Adjust the width as needed
+
+                HorizontalLayout buttonsLayout = new HorizontalLayout(cancelButton, sendButton);
+                buttonsLayout.getStyle().set("padding-top", "10em"); // Adjust padding as needed
+                // Align "Send" button to the right within the buttonsLayout
+                // Add components to the dialog
+                activityDialog.add(measureTemperatureHeading, new HorizontalLayout(temperatureInput, celsiusSymbol), buttonsLayout);
+            } else if ("Measure pressure".equals(event.getValue())) {
+                // Measure pressure content
+                H2 measurePressureHeading = new H2("Measure pressure");
+                measurePressureHeading.addClassName("H2");
+
+                TextField sysPressureInput = new TextField();
+                sysPressureInput.setWidth("10em"); // Set the width to 10 em
+                sysPressureInput.setPlaceholder("SYS Input"); // Add a placeholder text if needed
+                sysPressureInput.getStyle().set("font-size", "1.5em"); // Adjust the font size as needed
+
+                H2 mmHgSymbolSys = new H2("mmHg");
+                mmHgSymbolSys.getStyle().set("font-size", "2.3em"); // Adjust the font size as needed
+
+                TextField diaPressureInput = new TextField();
+                diaPressureInput.setWidth("10em"); // Set the width to 10 em
+                diaPressureInput.setPlaceholder("DIA Input"); // Add a placeholder text if needed
+                diaPressureInput.getStyle().set("font-size", "1.5em"); // Adjust the font size as needed
+
+                H2 mmHgSymbolDia = new H2("mmHg");
+                mmHgSymbolDia.getStyle().set("font-size", "2.3em"); // Adjust the font size as needed
+
+                Button cancelButton = new Button("Cancel", e -> activityDialog.close());
+                Button sendButton = new Button("Send", e -> System.out.println("Send"));
+
+                cancelButton.getStyle().set("background-color", "#C33F23");
+                cancelButton.getStyle().set("font-size", "1.5em"); // Adjust the font size as needed
+                cancelButton.getStyle().set("color", "white");
+                cancelButton.setWidth("6em"); // Adjust the width as needed
+
+                sendButton.getStyle().set("font-size", "1.5em"); // Adjust the font size as needed
+                sendButton.getElement().getStyle().set("margin-left", "auto");
+                sendButton.setWidth("6em"); // Adjust the width as needed
+
+                HorizontalLayout buttonsLayout = new HorizontalLayout(cancelButton, sendButton);
+                buttonsLayout.getStyle().set("padding-top", "7em"); // Adjust padding as needed
+                buttonsLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END); // Align buttons to the end
+
+                // Add components to the dialog
+                activityDialog.add(measurePressureHeading,
+                        new HorizontalLayout(sysPressureInput, mmHgSymbolSys),
+                        new HorizontalLayout(diaPressureInput, mmHgSymbolDia),
+                        buttonsLayout);
+            }
+
+            // Open the dialog when an item is selected
+            activityDialog.open();
+        });
+
+        leftSideLayout.add(mainDoctorHeading, nameSurnameLabel, specializationLabel,
+                selectActivityHeading, activityComboBox);
+
+        // Right Side Layout
+        // Right Side Layout
         rightSideLayout = new VerticalLayout();
-        rightSideLayout.setWidth("70%");
-        rightSideLayout.setHeightFull();
+        rightSideLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
 
-        mainContainerLayout = new HorizontalLayout(leftSideLayout, rightSideLayout);
-        mainContainerLayout.setWidthFull();
-        mainContainerLayout.setHeightFull();
-    }
+        // Header
+        H2 activityGridHeading = new H2("Upcoming activities");
+        activityGridHeading.addClassName("H2");
 
-    private void createDoctorView() {
+        // Sample grid, you can replace it with your actual data
+        List<String[]> activitiesData = Arrays.asList(
+                new String[]{"Activity 1", "10:00 AM", "2024-01-18"},
+                new String[]{"Activity 2", "02:30 PM", "2024-01-19"}
+                // Add more data as needed
+        );
 
-        createWelcomeMessage();
+        Grid<String[]> activityGrid = new Grid<>();
+        activityGrid.addColumn(data -> data[0]).setHeader("Name of Activity");
+        activityGrid.addColumn(data -> data[1]).setHeader("Time");
+        activityGrid.addColumn(data -> data[2]).setHeader("Date");
 
-        List<User> selectedPatients = dbService.getPatientsAssignedToDoctor(currentUser.getId());
+        activityGrid.setItems(activitiesData);
 
-        Grid<DoctorsActivityDto> doctorsActivityDtoGrid = createDoctorsActivityDtoGrid();
-        Grid<User> patientsGrid = createPatientsGrid(doctorsActivityDtoGrid);
+        rightSideLayout.add(activityGridHeading, activityGrid);
 
-        rightSideLayout.add(patientsGrid);
+        // Main Layout
+        H2 header = new H2("Hello " + securityService.getAuthenticatedUser().getUser().getName());
+        header.addClassName("H1");
 
-        activitySelectorLayout = new VerticalLayout();
-        activityDetailsLayout = new HorizontalLayout();
+        // Use a HorizontalLayout to organize the left and right side layouts
+        HorizontalLayout mainContentLayout = new HorizontalLayout(leftSideLayout, rightSideLayout);
+        mainContentLayout.expand(leftSideLayout);
+        mainContentLayout.setSizeFull();
 
-        ComboBox<DoctorsActivityEnum> activityCombobox = new ComboBox<>("Doctors Activity");
-        activityCombobox.setItems(DoctorsActivityEnum.values());
-        activityCombobox.setItemLabelGenerator(DoctorsActivityEnum::getValue);
-
-        ComboBox<User> patientsCombobox = new ComboBox<>("Patients ");
-        patientsCombobox.setItems(selectedPatients);
-        patientsCombobox.setItemLabelGenerator(user -> user.getName() + " " + user.getSurname());
-
-        DateTimePicker dateTimePicker = new DateTimePicker();
-        dateTimePicker.getStyle().set("margin-top", "33px");
-        dateTimePicker.setMin(LocalDateTime.now());
-
-        ActivityDescriptionDialog activityDescriptionDialog = new ActivityDescriptionDialog();
-        Button addDescriptionButton = new Button("Add description", event -> {
-            activityDescriptionDialog.open();
-        });
-
-        Button selectActivity = new Button("Select activity", event -> {
-
-            if(activityCombobox.getValue() == DoctorsActivityEnum.PRESCRIPTION) {
-                if (patientsCombobox.isEmpty()) {
-                    Notification.show("Please select all the boxes to create activity!");
-                } else {
-                    Prescription prescription = new Prescription();
-                    prescription.setDoctorId(currentUser.getId());
-                    prescription.setPatientId(patientsCombobox.getValue().getId());
-                    prescription.setPrescriptionTime(LocalDateTime.now());
-
-                    PrescriptionActivityDialog prescriptionActivityDialog = new PrescriptionActivityDialog(dbService, prescription);
-                    prescriptionActivityDialog.open();
-                }
-            } else {
-                if (activityCombobox.isEmpty() || patientsCombobox.isEmpty() || dateTimePicker.isEmpty()) {
-                    Notification.show("Please select all the boxes to create activity");
-                } else {
-                    DoctorsActivity doctorsActivity = new DoctorsActivity(currentUser.getId(), patientsCombobox.getValue().getId(),
-                            activityCombobox.getValue().getValue(), activityDescriptionDialog.getDescription(), LocalDateTime.now(), dateTimePicker.getValue(), false);
-                    dbService.addNewDoctorsActivity(doctorsActivity);
-                    Notification.show("Created new Activity");
-                    activityCombobox.clear();
-                    patientsCombobox.clear();
-                    dateTimePicker.clear();
-                    doctorsActivityDtoGrid.setItems(dbService.getActivityDtoByDoctorId(currentUser.getId()));
-                }
-            }
-
-        });
-
-        activityCombobox.addValueChangeListener(value -> {
-            if(value.getValue() == DoctorsActivityEnum.PRESCRIPTION) {
-                activityDetailsLayout.remove(dateTimePicker);
-                activityDetailsLayout.remove(addDescriptionButton);
-            } else {
-                activityDetailsLayout.remove(selectActivity);
-                activityDetailsLayout.add(dateTimePicker);
-                activityDetailsLayout.add(addDescriptionButton);
-                activityDetailsLayout.add(selectActivity);
-            }
-        });
-
-        addDescriptionButton.getStyle().set("margin-top", "35px");
-        selectActivity.getStyle().set("margin-top", "35px");
-
-        activityDetailsLayout.add(activityCombobox, patientsCombobox, dateTimePicker, addDescriptionButton, selectActivity);
-
-        activitySelectorLayout.add(activityDetailsLayout);
-
-        add(doctorsActivityDtoGrid);
-        add(activitySelectorLayout);
-
-        //leftSideLayout.add(activitySelectorLayout);
-    }
-
-    private Grid<User> createPatientsGrid(Grid<DoctorsActivityDto> doctorsActivityDtoGrid) {
-        Grid<User> patientsGrid = new Grid<>(User.class, false);
-        patientsGrid.addColumn(User::getName).setHeader("First Name");
-        patientsGrid.addColumn(User::getSurname).setHeader("Surname");
-        patientsGrid.addColumn(User::getMail).setHeader("Mail");
-        patientsGrid.addColumn(column -> column.getClinic() == null ? "" : column.getClinic().getName()).setHeader("Clinic");
-        patientsGrid.addComponentColumn(patient -> {
-            Button button = new Button("End treatment");
-            button.addClickListener(event -> {
-                dbService.removeAllPatientsDoctorsActivitiesByPatientId(patient.getId());
-                dbService.removeAllPatientsActivitiesForPatientId(patient.getId());
-                dbService.removeAssignedPatient(patient.getId());
-                Notification.show("Treatment finalised for patient: " + patient.getName() + " " + patient.getSurname());
-                doctorsActivityDtoGrid.setItems(dbService.getActivityDtoByDoctorId(currentUser.getId()));
-                patientsGrid.setItems(dbService.getPatientsAssignedToDoctor(currentUser.getId()));
-
-            });
-            return button;
-        }).setHeader("Action");
-
-        patientsGrid.setItems(dbService.getPatientsAssignedToDoctor(currentUser.getId()));
-
-        return patientsGrid;
-    }
-
-    private Grid<DoctorsActivityDto> createDoctorsActivityDtoGrid() {
-
-        Grid<DoctorsActivityDto> activityGrid = new Grid<>(DoctorsActivityDto.class, false);
-        activityGrid.addColumn(DoctorsActivityDto::getFullName).setHeader("Name");
-        activityGrid.addColumn(DoctorsActivityDto::getActivityType).setHeader("Type");
-        activityGrid.addColumn(column -> MedioUtils.formatDateTimeDefault(column.getLocalDateTime())).setHeader("Deadline");
-        activityGrid.addComponentColumn(activity -> {
-
-            Button button = new Button("Show reply");
-            if(!activity.isCompleted()) {
-                button.setEnabled(false);
-                button.setTooltipText("Activity is not yet completed");
-            } else {
-                button.addClickListener(event -> {
-                    ActivityCompletedDialog activityCompletedDialog = new ActivityCompletedDialog(dbService, activity.getActivityId());
-                    activityCompletedDialog.open();
-                });
-            }
-
-            return button;
-        }).setHeader("Show reply");
-        activityGrid.addComponentColumn(activity -> {
-            Button button = new Button("Remove activity");
-            button.addClickListener(event -> {
-                dbService.removeDoctorsActivity(activity.getActivityId());
-                dbService.removePatientActivityByDoctorsRequestId(activity.getActivityId());
-
-                Notification.show("Removed activity: " + activity.getActivityType() + " for " + activity.getFullName());
-                activityGrid.setItems(dbService.getActivityDtoByDoctorId(currentUser.getId()));
-            });
-            return button;
-        }).setHeader("Remove Action");
-
-        activityGrid.setItems(dbService.getActivityDtoByDoctorId(currentUser.getId()));
-
-        return activityGrid;
-    }
-
-    private Grid<DoctorsActivityDto> createDoctorsActivityDtoGridForPatient() {
-        Grid<DoctorsActivityDto> activityGrid = new Grid<>(DoctorsActivityDto.class, false);
-
-        activityGrid.addColumn(DoctorsActivityDto::getActivityType).setHeader("Type");
-        activityGrid.addColumn(column -> MedioUtils.formatDateTimeDefault(column.getLocalDateTime())).setHeader("Deadline");
-        activityGrid.addColumn(column -> MedioUtils.getReaminingDuration(column.getLocalDateTime())).setHeader("Remaining");
-        activityGrid.addComponentColumn(component -> {
-            Button button = new Button("Perform activity", event -> {
-                ActivityActionDialog modal = new ActivityActionDialog(dbService, component, activityGrid);
-                modal.open();
-            });
-            return button;
-        }).setHeader("Action");
-
-        activityGrid.setItems(dbService.getActivityDtoByPatientId(currentUser.getId()));
-
-        return activityGrid;
-    }
-
-    private void createPatientView() {
-
-        createWelcomeMessage();
-
-        if (dbService.patientHasDoctor(currentUser.getId())) {
-            User patientsDoctor = dbService.getPatientsDoctor(currentUser.getId());
-            createDoctorDetails(patientsDoctor);
-        } else {
-            Button selectDoctorButton = new Button("Select your Doctor");
-            selectDoctorButton.addClickListener(event -> {
-                DoctorSelectionDialog dialog = new DoctorSelectionDialog(this.currentUser, dbService.getAvailableDoctors(), dbService);
-                dialog.open();
-            });
-            leftSideLayout.add(selectDoctorButton);
-        }
-
-        Grid<DoctorsActivityDto> activityGrid = createDoctorsActivityDtoGridForPatient();
-
-        rightSideLayout.add(activityGrid);
-
-    }
-
-    private void createWelcomeMessage() {
-        H2 welcomeMessage = new H2("Hello " + currentUser.getName());
-        H3 currentDate = new H3("Today is: " + LocalDate.now().toString());
-        currentDate.getStyle().set("margin", "15px");
-
-        detailsLayout = new VerticalLayout(welcomeMessage, currentDate);
-        detailsLayout.setAlignItems(Alignment.CENTER);
-
-        detailsLayout.setHeight("50%");
-        leftSideLayout.add(detailsLayout);
-    }
-
-    private void createDoctorDetails(User user) {
-        H2 doctorName = new H2("Your Doctor: " + user.getName() + " " + user.getSurname());
-        H3 specializationLabel = new H3("Specialization " + user.getSpecialization());
-        if (user.getSpecialization() != null) {
-            detailsLayout.add(doctorName, specializationLabel);
-        } else {
-            detailsLayout.add(doctorName);
-        }
-    }
-
-    private void createAdminView() {
-
+        add(header, mainContentLayout);
     }
 }
