@@ -5,29 +5,39 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
-@Table(name = "specializations", schema = "public")
+@Table(name = "roles", schema = "public")
 @Data
-public class Specialization {
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotBlank
-    @Size(max = 32)
+    @Column(name = "name", length = 32)
     private String name;
 
+    @Column(name = "description")
     private String description;
 
-    public Specialization() {
+    @Column(name = "sample_permission_1")
+    private boolean samplePermission1;
+
+    @Column(name = "sample_permission_2")
+    private boolean samplePermission2;
+
+    @Column(name = "sample_permission_3")
+    private boolean samplePermission3;
+
+    public Role() {
     }
 
-    public Specialization(String name, String description) {
+    public Role(String name, String description) {
         this.name = name;
         this.description = description;
     }

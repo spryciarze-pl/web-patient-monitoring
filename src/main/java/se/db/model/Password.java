@@ -6,29 +6,25 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
-@Table(name = "specializations", schema = "public")
+@Table(name = "passwords", schema = "public")
 @Data
-public class Specialization {
+public class Password {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotBlank
-    @Size(max = 32)
-    private String name;
+    private String hashedPassword;
 
-    private String description;
-
-    public Specialization() {
+    public Password() {
     }
 
-    public Specialization(String name, String description) {
-        this.name = name;
-        this.description = description;
+    public Password(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
     }
+
 }

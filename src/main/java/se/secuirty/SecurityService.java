@@ -13,8 +13,8 @@ public class SecurityService {
         this.authenticationContext = authenticationContext;
     }
 
-    public UserDetails getAuthenticatedUser() {
-        return authenticationContext.getAuthenticatedUser(UserDetails.class).get();
+    public CustomUserDetails getAuthenticatedUser() {
+        return authenticationContext.getAuthenticatedUser(CustomUserDetails.class).get();
     }
 
     public void logout() {

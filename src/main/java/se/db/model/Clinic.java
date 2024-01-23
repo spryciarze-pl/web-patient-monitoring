@@ -10,9 +10,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity
-@Table(name = "specializations", schema = "public")
+@Table(name = "clinics", schema = "public")
 @Data
-public class Specialization {
+public class Clinic  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,13 +22,24 @@ public class Specialization {
     @Size(max = 32)
     private String name;
 
-    private String description;
+    @NotBlank
+    private String address;
 
-    public Specialization() {
+    @NotBlank
+    @Size(max = 32)
+    private String phone;
+
+    @NotBlank
+    @Size(max = 64)
+    private String mail;
+
+    public Clinic() {
     }
 
-    public Specialization(String name, String description) {
+    public Clinic(String name, String address, String phone, String mail) {
         this.name = name;
-        this.description = description;
+        this.address = address;
+        this.phone = phone;
+        this.mail = mail;
     }
 }
