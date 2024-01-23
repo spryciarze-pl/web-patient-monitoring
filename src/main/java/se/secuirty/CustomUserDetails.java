@@ -1,26 +1,18 @@
 package se.secuirty;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import se.db.model.Clinic;
-import se.db.model.Specialization;
+import se.db.model.User;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
 
+@Getter
 public class CustomUserDetails implements UserDetails {
 
-    private Integer id;
-    private String name;
-    private String surname;
-    private String pin;
-    private String phone;
-    private String mail;
-    private LocalDateTime registrationTime;
-    private boolean confirmed;
+    private User user;
     private String password;
-    private Integer roleId;
     private Set<GrantedAuthority> authorities;
 
     @Override
@@ -35,26 +27,33 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return mail;
+        return user.getMail();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
         return true;
     }
+
+    public CustomUserDetails(User user, String password, Set<GrantedAuthority> grantedAuthorities) {
+        this.user = user;
+        this.password = password;
+        this.authorities = grantedAuthorities;
+    }
+
 }

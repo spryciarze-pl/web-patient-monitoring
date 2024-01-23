@@ -45,9 +45,8 @@ public class UserDetailsService implements org.springframework.security.core.use
         if (user == null) {
             throw new UsernameNotFoundException(mail);
         }
+        CustomUserDetails usr1 = new CustomUserDetails(user, passwordEncoder.encode(password.getHashedPassword()), authorities);
 
-        org.springframework.security.core.userdetails.User usr = new org.springframework.security.core.userdetails.User(user.getMail(), password.getHashedPassword(), authorities);
-
-        return new org.springframework.security.core.userdetails.User(user.getMail(), passwordEncoder.encode(password.getHashedPassword()), authorities);
+        return usr1;
     }
 }
