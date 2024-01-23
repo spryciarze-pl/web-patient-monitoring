@@ -7,6 +7,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.beans.factory.annotation.Autowired;
+import se.db.repository.UserRepository;
 import se.secuirty.SecurityService;
 import se.views.MainLayout;
 
@@ -15,14 +17,16 @@ import se.views.MainLayout;
 @Route(value = "profile", layout = MainLayout.class)
 public class ProfileView extends VerticalLayout {
 
+    @Autowired
+    UserRepository userRepository;
     public ProfileView(SecurityService securityService) {
         setWidth("min-content");
-        H3 h3 = new H3("Name: ");
-        H3 h32 = new H3("Surname: ");
-        H3 h33 = new H3("PESEL: ");
+        H3 h3 = new H3("Name: " + securityService.getAuthenticatedUser().getUser().getName());
+        H3 h32 = new H3("Surname: " + securityService.getAuthenticatedUser().getUser().getSurname());
+        H3 h33 = new H3("PESEL: " + securityService.getAuthenticatedUser().getUser().getPin());
         H3 h34 = new H3("Password: ");
-        H3 h35 = new H3("E-mail address: " + securityService.getAuthenticatedUser().getUsername());
-        H3 h36 = new H3("Phone number: ");
+        H3 h35 = new H3("E-mail address: " + securityService.getAuthenticatedUser().getUser().getMail());
+        H3 h36 = new H3("Phone number: " + securityService.getAuthenticatedUser().getUser().getPhone());
         Button button = new Button("Change");
         button.addClickListener(event -> System.out.println("TEST"));
         setAlignSelf(FlexComponent.Alignment.CENTER, button);
