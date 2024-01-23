@@ -15,6 +15,7 @@ import se.views.MainLayout;
 @PageTitle("Profile")
 @Route(value = "profile", layout = MainLayout.class)
 public class ProfileView extends VerticalLayout {
+
     public ProfileView(SecurityService securityService) {
 
         User curentUser = securityService.getAuthenticatedUser().getUser();
