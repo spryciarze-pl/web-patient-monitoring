@@ -14,7 +14,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
-import se.secuirty.SecurityService;
+import se.security.SecurityService;
 import se.views.about.AboutView;
 import se.views.activity.ActivityView;
 import se.views.panel.PanelView;

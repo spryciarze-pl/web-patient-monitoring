@@ -2,7 +2,6 @@ package se.views.panel;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -12,23 +11,21 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import se.db.model.Specialization;
-import se.db.repository.AssignmentRepository;
-import se.db.repository.DoctorsActivityRepository;
-import se.db.repository.PatientsActivityRepository;
-import se.db.repository.SpecializationRepository;
-import se.secuirty.SecurityService;
+import se.db.model.Assignment;
+import se.db.model.User;
+import se.db.repository.*;
+import se.security.SecurityService;
 import se.views.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
+
 import java.util.Arrays; //to delete later
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.textfield.TextField;
+import se.views.panel.dialogs.DoctorSelectionDialog;
 
 
-
-import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @PermitAll
 @PageTitle("Hello World")
@@ -46,21 +43,115 @@ public class PanelView extends VerticalLayout {
     DoctorsActivityRepository doctorsActivityRepository;
 
     @Autowired
-    private SecurityService securityService;
+    UserRepository userRepository;
+
+    @Autowired
+    SecurityService securityService;
+
+    private User currentUser;
 
 
+    private HorizontalLayout mainContainerLayout;
     private VerticalLayout leftSideLayout;
+    private VerticalLayout detailsLayout;
+    private VerticalLayout activitySelectorLayout;
+
     private VerticalLayout rightSideLayout;
 
-    private VerticalLayout leftSide;
-    private VerticalLayout doctorDetailsLayout;
-
-    private VerticalLayout activitySelectorLayout;
-    private VerticalLayout rightSide;
 
 
+    public PanelView(SecurityService securityService, AssignmentRepository assignmentRepository,
+                     PatientsActivityRepository patientsActivityRepository, DoctorsActivityRepository doctorsActivityRepository,
+                     SpecializationRepository specializationRepository, UserRepository userRepository) {
+        this.securityService = securityService;
+        this.assignmentRepository = assignmentRepository;
+        this.patientsActivityRepository = patientsActivityRepository;
+        this.doctorsActivityRepository = doctorsActivityRepository;
+        this.specializationRepository = specializationRepository;
+        this.userRepository = userRepository;
 
-    public PanelView(SecurityService securityService) {
+        this.currentUser = securityService.getAuthenticatedUser().getUser();
+
+        prepareView();
+
+
+        switch (currentUser.getRoleId()) {
+            case 3:
+                createAdminView();
+                break;
+            case 2:
+                createDoctorView();
+                break;
+            case 1:
+                createPatientView();
+                break;
+        }
+
+        add(mainContainerLayout);
+    }
+
+    private void prepareView() {
+
+        leftSideLayout = new VerticalLayout();
+        leftSideLayout.setWidth("50%");
+        leftSideLayout.setHeightFull();
+
+        rightSideLayout = new VerticalLayout();
+        rightSideLayout.setWidth("50%");
+        rightSideLayout.setHeightFull();
+
+        mainContainerLayout = new HorizontalLayout(leftSideLayout, rightSideLayout);
+        mainContainerLayout.setWidthFull();
+        mainContainerLayout.setHeightFull();
+
+    }
+
+    private void createDoctorView() {
+        List<User> selectedPatients = assignmentRepository.findByDoctorId(this.currentUser.getId()).stream()
+                .map(id -> userRepository.findById(id.getPatientId())).toList();
+
+        Grid<User> grid = new Grid<>(User.class, false);
+        grid.addColumn(User::getName).setHeader("First Name");
+        grid.addColumn(User::getSurname).setHeader("Surname");
+        grid.addColumn(User::getMail).setHeader("Mail");
+        grid.addColumn(User::getClinic).setHeader("Clinic");
+
+        grid.setItems(selectedPatients);
+
+        leftSideLayout.add(grid);
+    }
+
+    private void createPatientView() {
+
+        if (assignmentRepository.findByPatientId(this.currentUser.getId()) != null) {
+            User patientsDoctor = userRepository.findById(assignmentRepository.findByPatientId(this.currentUser.getId()).getDoctorId());
+            createDoctorDetails(patientsDoctor);
+        } else {
+            Button selectDoctorButton = new Button("Select your Doctor");
+            selectDoctorButton.addClickListener(event -> {
+                List<Integer> availableDoctorsIds = assignmentRepository.findDoctorsWithMoreThan5Assignments();
+                List<User> avaibleDoctors = userRepository.findByRoleId(2);
+
+                avaibleDoctors = avaibleDoctors.stream().filter(user -> !availableDoctorsIds.contains(user.getId())).collect(Collectors.toList());
+
+                DoctorSelectionDialog dialog = new DoctorSelectionDialog(this.currentUser, avaibleDoctors, assignmentRepository);
+                dialog.open();
+
+            });
+            leftSideLayout.add(selectDoctorButton);
+        }
+
+    }
+
+    private void createDoctorDetails(User user) {
+
+    }
+
+    private void createAdminView() {
+
+    }
+
+    private void test() {
         this.securityService = securityService;
 
         // Left Side Layout
@@ -208,4 +299,6 @@ public class PanelView extends VerticalLayout {
 
         add(header, mainContentLayout);
     }
+
+
 }

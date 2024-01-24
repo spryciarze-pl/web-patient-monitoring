@@ -6,7 +6,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
-import se.secuirty.UserDetailsService;
+import se.security.UserDetailsService;
 
 @Route("login")
 @PageTitle("Login")
