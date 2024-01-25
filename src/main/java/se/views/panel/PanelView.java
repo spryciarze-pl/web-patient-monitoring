@@ -2,8 +2,10 @@ package se.views.panel;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -12,12 +14,17 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.db.model.Assignment;
+import se.db.model.DoctorsActivity;
+import se.db.model.PatientsActivity;
 import se.db.model.User;
 import se.db.repository.*;
+import se.dto.DoctorsActivityDto;
+import se.enums.DoctorsActivityEnum;
 import se.security.SecurityService;
 import se.views.MainLayout;
 import com.vaadin.flow.component.grid.Grid;
 
+import java.time.LocalDateTime;
 import java.util.Arrays; //to delete later
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.textfield.TextField;
@@ -55,7 +62,7 @@ public class PanelView extends VerticalLayout {
     private VerticalLayout leftSideLayout;
     private VerticalLayout detailsLayout;
     private VerticalLayout activitySelectorLayout;
-
+    private HorizontalLayout activityDetailsLayout;
     private VerticalLayout rightSideLayout;
 
 
@@ -76,13 +83,13 @@ public class PanelView extends VerticalLayout {
 
 
         switch (currentUser.getRoleId()) {
-            case 3:
+            case 1:
                 createAdminView();
                 break;
             case 2:
                 createDoctorView();
                 break;
-            case 1:
+            case 3:
                 createPatientView();
                 break;
         }
@@ -110,15 +117,71 @@ public class PanelView extends VerticalLayout {
         List<User> selectedPatients = assignmentRepository.findByDoctorId(this.currentUser.getId()).stream()
                 .map(id -> userRepository.findById(id.getPatientId())).toList();
 
-        Grid<User> grid = new Grid<>(User.class, false);
-        grid.addColumn(User::getName).setHeader("First Name");
-        grid.addColumn(User::getSurname).setHeader("Surname");
-        grid.addColumn(User::getMail).setHeader("Mail");
-        grid.addColumn(User::getClinic).setHeader("Clinic");
+        Grid<User> patientsGrid = new Grid<>(User.class, false);
+        patientsGrid.addColumn(User::getName).setHeader("First Name");
+        patientsGrid.addColumn(User::getSurname).setHeader("Surname");
+        patientsGrid.addColumn(User::getMail).setHeader("Mail");
+        patientsGrid.addColumn(User::getClinic).setHeader("Clinic");
 
-        grid.setItems(selectedPatients);
+        patientsGrid.setItems(selectedPatients);
 
-        leftSideLayout.add(grid);
+        List<DoctorsActivityDto> doctorsActivityDtos;
+
+        doctorsActivityDtos = doctorsActivityRepository.findByDoctorId(currentUser.getId()).stream()
+                .map(activity -> new DoctorsActivityDto(userRepository.findById(activity.getPatientId()), activity))
+                .toList();
+
+        Grid<DoctorsActivityDto> activityGrid = new Grid<>(DoctorsActivityDto.class, false);
+        activityGrid.addColumn(DoctorsActivityDto::getFullName).setHeader("Name");
+        activityGrid.addColumn(DoctorsActivityDto::getLocalDateTime).setHeader("Deadline");
+        activityGrid.addColumn(DoctorsActivityDto::getActivityType).setHeader("Type");
+
+        activityGrid.setItems(doctorsActivityDtos);
+
+        rightSideLayout.add(activityGrid);
+
+        leftSideLayout.add(patientsGrid);
+
+        activitySelectorLayout = new VerticalLayout();
+        activityDetailsLayout = new HorizontalLayout();
+
+        ComboBox<DoctorsActivityEnum> activityCombobox = new ComboBox<>("Doctors Activity");
+        activityCombobox.setItems(DoctorsActivityEnum.values());
+        activityCombobox.setItemLabelGenerator(DoctorsActivityEnum::getValue);
+
+        ComboBox<User> patientsCombobox = new ComboBox<>("Patients ");
+        patientsCombobox.setItems(selectedPatients);
+        patientsCombobox.setItemLabelGenerator(User::getName);
+
+        DateTimePicker dateTimePicker = new DateTimePicker();
+        dateTimePicker.getStyle().set("margin-top", "33px");
+
+
+        Button selectActivity = new Button("Select activity", event -> {
+
+            if(activityCombobox.isEmpty() || patientsCombobox.isEmpty() || dateTimePicker.isEmpty()) {
+                Notification.show("Please select all the boxes to create activity!").open();
+            }
+
+            DoctorsActivity doctorsActivity = new DoctorsActivity(currentUser.getId(), patientsCombobox.getValue().getId(),
+                    activityCombobox.getValue().getValue(), "null", LocalDateTime.now(), dateTimePicker.getValue());
+            doctorsActivityRepository.save(doctorsActivity);
+            activityCombobox.clear();
+            patientsCombobox.clear();
+            dateTimePicker.clear();
+            activityGrid.setItems(doctorsActivityRepository.findByDoctorId(currentUser.getId()).stream()
+                    .map(activity -> new DoctorsActivityDto(userRepository.findById(activity.getPatientId()), activity))
+                    .toList());
+        });
+
+        selectActivity.getStyle().set("margin-top", "35px");
+
+        activityDetailsLayout.add(activityCombobox, patientsCombobox, dateTimePicker, selectActivity);
+
+        activitySelectorLayout.add(activityDetailsLayout);
+
+        leftSideLayout.add(activitySelectorLayout);
+
     }
 
     private void createPatientView() {
@@ -141,10 +204,29 @@ public class PanelView extends VerticalLayout {
             leftSideLayout.add(selectDoctorButton);
         }
 
+        List<DoctorsActivity> patientsActivities = doctorsActivityRepository.findByPatientId(currentUser.getId());
+        List<DoctorsActivityDto> patientsActivitiesDto = patientsActivities.stream().map(DoctorsActivityDto::new).toList();
+
+        Grid<DoctorsActivityDto> activityGrid = new Grid<>(DoctorsActivityDto.class, false);
+        activityGrid.addColumn(DoctorsActivityDto::getLocalDateTime).setHeader("Deadline");
+        activityGrid.addColumn(DoctorsActivityDto::getActivityType).setHeader("Type");
+
+        activityGrid.setItems(patientsActivitiesDto);
+
+        rightSideLayout.add(activityGrid);
+
     }
 
     private void createDoctorDetails(User user) {
 
+        detailsLayout = new VerticalLayout();
+
+        H2 doctorName = new H2("Main Doctor: " + user.getName() + " " + user.getSurname());
+        H3 specializationLabel = new H3("Specialization " + user.getSpecialization());
+
+        detailsLayout.add(doctorName, specializationLabel);
+        detailsLayout.setHeight("50%");
+        leftSideLayout.add(detailsLayout);
     }
 
     private void createAdminView() {
