@@ -37,16 +37,21 @@ public class DoctorsActivity {
 
     @Column(name = "deadline_time", nullable = false)
     private LocalDateTime deadlineTime;
+
+    @Column(name = "completed", nullable = false)
+    private boolean completed;
+
     public DoctorsActivity() {
     }
 
-    public DoctorsActivity(Integer doctorId, Integer patientId, String type, String description, LocalDateTime activityTime, LocalDateTime deadlineTime) {
+    public DoctorsActivity(Integer doctorId, Integer patientId, String type, String description, LocalDateTime activityTime, LocalDateTime deadlineTime, boolean completed) {
         this.doctorId = doctorId;
         this.patientId = patientId;
         this.type = type;
         this.description = description;
         this.activityTime = activityTime;
         this.deadlineTime = deadlineTime;
+        this.completed = completed;
     }
 
 

@@ -71,8 +71,7 @@ public class MainLayout extends AppLayout {
     private Footer createFooter() {
         Footer layout = new Footer();
 
-        String u = securityService.getAuthenticatedUser().getUser().getName();
-        logoutButton = new Button("Log out " + u, e -> securityService.logout());
+        logoutButton = new Button("Log out", e -> securityService.logout());
         logoutButton.getStyle().set("width", "100%");
         layout.add(logoutButton);
 

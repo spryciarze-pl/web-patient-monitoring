@@ -8,6 +8,7 @@ import se.db.model.*;
 import se.db.repository.*;
 import se.dto.DoctorsActivityDto;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,13 +50,20 @@ public class DbService {
     public List<DoctorsActivityDto> getActivityDtoByDoctorId(int doctorId) {
         return doctorsActivityRepository.findByDoctorId(doctorId).stream()
                 .map(activity -> new DoctorsActivityDto(userRepository.findById(activity.getPatientId()), activity))
+                //.sorted(Comparator.comparing(DoctorsActivityDto::getLocalDateTime))
                 .toList();
     }
 
     public List<DoctorsActivityDto> getActivityDtoByPatientId(int patientId) {
         return doctorsActivityRepository.findByPatientId(patientId).stream()
+                .filter(activity -> !activity.isCompleted())
                 .map(activity -> new DoctorsActivityDto(userRepository.findById(patientId), activity))
+                .sorted(Comparator.comparing(DoctorsActivityDto::getLocalDateTime))
                 .toList();
+    }
+
+    public void setDoctorsActivityAsComplete(int activityId) {
+        doctorsActivityRepository.markDoctorsActivityAsComplete(activityId);
     }
 
     public DoctorsActivity getActivityById(int activityId) {
@@ -90,7 +98,7 @@ public class DbService {
         doctorsActivityRepository.deleteById((long) activityId);
     }
 
-    public void removeAllPatientsActivities(int patientsId) {
+    public void removeAllPatientsDoctorsActivitiesByPatientId(int patientsId) {
         doctorsActivityRepository.deleteByPatientId(patientsId);
     }
 
@@ -129,6 +137,18 @@ public class DbService {
 
     public void saveNewPatientActivity(PatientsActivity activity) {
         patientsActivityRepository.save(activity);
+    }
+
+    public PatientsActivity getPatientActivityByDoctorsActivityId(int activityId) {
+        return patientsActivityRepository.findByDoctorsRequestId(activityId);
+    }
+
+    public void removeAllPatientsActivitiesForPatientId(int patientId) {
+        patientsActivityRepository.deleteByPatientId(patientId);
+    }
+
+    public void removePatientActivityByDoctorsRequestId(int doctorsRequestId) {
+        patientsActivityRepository.deleteByDoctorsRequestId(doctorsRequestId);
     }
 
 }
