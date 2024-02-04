@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 @Data
 public class DoctorsActivityDto {
 
+    private Integer activityId;
+
     private String fullName;
 
     private String activityType;
@@ -19,11 +21,13 @@ public class DoctorsActivityDto {
         this.fullName = user.getName() + " " + user.getSurname();
         this.activityType = activity.getType();
         this.localDateTime = activity.getDeadlineTime();
+        this.activityId = activity.getId();
     }
 
     public DoctorsActivityDto(DoctorsActivity activity) {
         this.activityType = activity.getType();
         this.localDateTime = activity.getDeadlineTime();
+        this.activityId = activity.getId();
     }
 
 }
