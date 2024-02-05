@@ -28,7 +28,9 @@ public class ProfileView extends VerticalLayout {
         H3 h35 = new H3("E-mail address: " + curentUser.getMail());
         H3 h36 = new H3("Phone number: " + curentUser.getPhone());
         Button button = new Button("Change");
-        button.addClickListener(event -> System.out.println("TEST"));
+        ChangeUserInfoDialog dialog = new ChangeUserInfoDialog(securityService.getAuthenticatedUser().getUser());
+        button.addClickListener(e -> dialog.open());
+
         setAlignSelf(FlexComponent.Alignment.CENTER, button);
         add(h3, h32, h33, h34, h35, h36);
         add(button);
