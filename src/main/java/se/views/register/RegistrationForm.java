@@ -46,7 +46,7 @@ public class RegistrationForm extends VerticalLayout {
         HorizontalLayout pinAndPhoneLayout = new HorizontalLayout(pin, phone);
         pinAndPhoneLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         pinAndPhoneLayout.setWidthFull();
-        HorizontalLayout roleAndClinicLayout=  new HorizontalLayout(roleComboBox, clinicComboBox);
+        HorizontalLayout roleAndClinicLayout = new HorizontalLayout(roleComboBox, clinicComboBox);
         roleAndClinicLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         roleAndClinicLayout.setWidthFull();
         HorizontalLayout passwordsLayout = new HorizontalLayout(password, confirmPassword);
@@ -116,7 +116,7 @@ public class RegistrationForm extends VerticalLayout {
         newUser.setRegistrationTime(LocalDateTime.now());
         newUser.setConfirmed(false);
 
-        if(newUser.getRoleId() == 2) {
+        if (newUser.getRoleId() == 2) {
             newUser.setSpecialization(this.specializationComboBox.getValue());
         }
 
@@ -167,13 +167,15 @@ public class RegistrationForm extends VerticalLayout {
 
         binder.forField(password)
                 .asRequired("Field cannot be empty")
-                .bind(password -> "", (user, password) -> {});
+                .bind(password -> "", (user, password) -> {
+                });
         password.setWidth("50%");
 
         binder.forField(confirmPassword)
                 .asRequired("Field cannot be empty")
                 .withValidator(confirmPassword -> confirmPassword.equals(password.getValue()), "Passwords do not match")
-                .bind(confirmPassword -> "", (user, password) -> {});
+                .bind(confirmPassword -> "", (user, password) -> {
+                });
         confirmPassword.setWidth("50%");
     }
 

@@ -2,7 +2,6 @@ package se.db.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import se.db.model.enums.AppointmentTypeEnum;
 
 import java.time.LocalDateTime;
 
@@ -22,9 +21,8 @@ public class Appointment {
     @Column(name = "patient_id", nullable = false)
     private Integer patientId;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private AppointmentTypeEnum type;
+    private String type;
 
     @Column(name = "description", length = 128)
     private String description;

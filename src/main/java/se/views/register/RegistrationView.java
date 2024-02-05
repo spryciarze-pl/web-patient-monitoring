@@ -17,6 +17,7 @@ public class RegistrationView extends VerticalLayout {
     DbService dbService;
     private H1 title = new H1("MEDIO");
     private RegistrationForm registrationForm;
+
     public RegistrationView(DbService dbService) {
 
         title.getStyle().set("margin-top", "3%");
