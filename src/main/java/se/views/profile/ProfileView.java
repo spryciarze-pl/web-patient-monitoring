@@ -7,21 +7,26 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-import se.secuirty.SecurityService;
+import se.db.model.User;
+import se.security.SecurityService;
 import se.views.MainLayout;
 
 @PermitAll
 @PageTitle("Profile")
 @Route(value = "profile", layout = MainLayout.class)
 public class ProfileView extends VerticalLayout {
+
     public ProfileView(SecurityService securityService) {
+
+        User curentUser = securityService.getAuthenticatedUser().getUser();
+
         setWidth("min-content");
-        H3 h3 = new H3("Name: " + securityService.getAuthenticatedUser().getUser().getName());
-        H3 h32 = new H3("Surname: " + securityService.getAuthenticatedUser().getUser().getSurname());
-        H3 h33 = new H3("PESEL: " + securityService.getAuthenticatedUser().getUser().getPin());
-        H3 h34 = new H3("Password: ********");
-        H3 h35 = new H3("E-mail address: " + securityService.getAuthenticatedUser().getUser().getMail());
-        H3 h36 = new H3("Phone number: " + securityService.getAuthenticatedUser().getUser().getPhone());
+        H3 h3 = new H3("Name: " + curentUser.getName());
+        H3 h32 = new H3("Surname: " + curentUser.getSurname());
+        H3 h33 = new H3("PESEL: " + curentUser.getPin());
+        H3 h34 = new H3("Password: " + curentUser.getPasswordId());
+        H3 h35 = new H3("E-mail address: " + curentUser.getMail());
+        H3 h36 = new H3("Phone number: " + curentUser.getPhone());
         Button button = new Button("Change");
         ChangeUserInfoDialog dialog = new ChangeUserInfoDialog(securityService.getAuthenticatedUser().getUser());
         button.addClickListener(e -> dialog.open());
