@@ -31,7 +31,7 @@ public class ProfileView extends VerticalLayout {
         H3 h34 = new H3("Password: ********");
         H3 h35 = new H3("E-mail address: " + curentUser.getMail());
         H3 h36 = new H3("Phone number: " + curentUser.getPhone());
-        H3 h37 = new H3("Clinic: " + curentUser.getClinic());
+        H3 h37 = new H3("Clinic: " + curentUser.getClinic().getName());
 
         Button button = new Button("Change");
         ChangeUserInfoDialog dialog = new ChangeUserInfoDialog(dbService, curentUser);
@@ -39,8 +39,8 @@ public class ProfileView extends VerticalLayout {
 
         setAlignSelf(FlexComponent.Alignment.CENTER, button);
         add(h3, h32, h33, h34, h35, h36, h37);
-        if(curentUser.getRoleId().equals(1)) {
-            H3 h38 = new H3("Specialization: " + curentUser.getSpecialization());
+        if(curentUser.getRoleId().equals(2)) {
+            H3 h38 = new H3("Specialization: " + curentUser.getSpecialization().getName());
             add(h38);
         }
         add(button);
