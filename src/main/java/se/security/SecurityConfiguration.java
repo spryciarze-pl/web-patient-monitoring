@@ -1,4 +1,4 @@
-package se.secuirty;
+package se.security;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.beans.factory.annotation.Autowired;

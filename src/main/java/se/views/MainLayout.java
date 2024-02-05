@@ -14,10 +14,11 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIcon;
-import se.secuirty.SecurityService;
+import se.security.SecurityService;
 import se.views.about.AboutView;
 import se.views.activity.ActivityView;
 import se.views.panel.PanelView;
+import se.views.prescription.PrescriptionView;
 import se.views.profile.ProfileView;
 
 
@@ -60,7 +61,7 @@ public class MainLayout extends AppLayout {
         nav.addItem(new SideNavItem("Profile", ProfileView.class, LineAwesomeIcon.ADDRESS_BOOK.create()));
         nav.addItem(new SideNavItem("Activity", ActivityView.class, LineAwesomeIcon.FEATHER_ALT_SOLID.create()));
         nav.addItem(new SideNavItem("Appointments", AboutView.class, LineAwesomeIcon.CALENDAR.create()));
-        nav.addItem(new SideNavItem("Prescriptions", AboutView.class, LineAwesomeIcon.BELL.create()));
+        nav.addItem(new SideNavItem("Prescriptions", PrescriptionView.class, LineAwesomeIcon.BELL.create()));
         nav.addItem(new SideNavItem("Notifications", AboutView.class, LineAwesomeIcon.ENVELOPE.create()));
         nav.addItem(new SideNavItem("Chat", AboutView.class, LineAwesomeIcon.COMMENT.create()));
 
@@ -70,8 +71,7 @@ public class MainLayout extends AppLayout {
     private Footer createFooter() {
         Footer layout = new Footer();
 
-        String u = securityService.getAuthenticatedUser().getUser().getName();
-        logoutButton = new Button("Log out " + u, e -> securityService.logout());
+        logoutButton = new Button("Log out", e -> securityService.logout());
         logoutButton.getStyle().set("width", "100%");
         layout.add(logoutButton);
 

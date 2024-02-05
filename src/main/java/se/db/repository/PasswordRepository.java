@@ -6,4 +6,5 @@ import se.db.model.Password;
 public interface PasswordRepository extends JpaRepository<Password, Long> {
 
     Password findById(Integer id);
+    Password findByHashedPassword(String password);
 }
