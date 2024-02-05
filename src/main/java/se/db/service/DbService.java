@@ -115,6 +115,8 @@ public class DbService {
         return passwordRepository.findByHashedPassword(password.getHashedPassword()).getId();
     }
 
+    public void changePassword(Integer passwordId, String newPassword){ passwordRepository.updatePassword(passwordId, newPassword);}
+
     public void saveNewUser(User user) {
         userRepository.save(user);
     }
