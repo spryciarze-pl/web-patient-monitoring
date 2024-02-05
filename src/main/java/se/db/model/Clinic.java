@@ -12,7 +12,7 @@ import lombok.Data;
 @Entity
 @Table(name = "clinics", schema = "public")
 @Data
-public class Clinic  {
+public class Clinic {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -13,6 +13,7 @@ public class MedioUtils {
     public static String formatDateTimeWithFullMonthName(LocalDateTime dateTime) {
         return dateTime.format(formatterMonth);
     }
+
     public static String formatDateTimeDefault(LocalDateTime dateTime) {
         return dateTime.format(formatterDefault);
     }

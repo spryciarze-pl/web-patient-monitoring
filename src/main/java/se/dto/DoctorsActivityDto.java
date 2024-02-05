@@ -15,23 +15,31 @@ public class DoctorsActivityDto {
 
     private String activityType;
 
+    private String description;
+
     private LocalDateTime localDateTime;
+
+    private LocalDateTime deadline;
 
     private boolean completed;
 
     public DoctorsActivityDto(User user, DoctorsActivity activity) {
         this.fullName = user.getName() + " " + user.getSurname();
         this.activityType = activity.getType();
-        this.localDateTime = activity.getDeadlineTime();
+        this.localDateTime = activity.getActivityTime();
+        this.deadline = activity.getDeadlineTime();
         this.activityId = activity.getId();
         this.completed = activity.isCompleted();
+        this.description = activity.getDescription();
     }
 
     public DoctorsActivityDto(DoctorsActivity activity) {
         this.activityType = activity.getType();
-        this.localDateTime = activity.getDeadlineTime();
+        this.localDateTime = activity.getActivityTime();
+        this.deadline = activity.getDeadlineTime();
         this.activityId = activity.getId();
         this.completed = activity.isCompleted();
+        this.description = activity.getDescription();
     }
 
 }

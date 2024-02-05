@@ -7,7 +7,8 @@ public enum DoctorsActivityEnum {
     SUGAR("Measure Sugar Level"),
     OXYGEN("Measure oxygen-blood saturation"),
     PRESCRIPTION("Issue Prescription"),
-    MEDICINE("Take medicine");
+    MEDICINE("Take medicine"),
+    MISCELLANEOUS("Request from doctor");
 
     private String value;
 

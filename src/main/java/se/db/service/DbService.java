@@ -78,8 +78,9 @@ public class DbService {
         assignmentRepository.deleteByPatientId(patientId);
     }
 
-    public void addNewDoctorsActivity(DoctorsActivity activity) {
-        doctorsActivityRepository.save(activity);
+    public DoctorsActivity saveNewDoctorsActivity(DoctorsActivity activity) {
+        DoctorsActivity savedActivity = doctorsActivityRepository.save(activity);
+        return savedActivity;
     }
 
     public void assignPatientToDoctor(Assignment assignment) {
@@ -141,6 +142,10 @@ public class DbService {
 
     public PatientsActivity getPatientActivityByDoctorsActivityId(int activityId) {
         return patientsActivityRepository.findByDoctorsRequestId(activityId);
+    }
+
+    public List<PatientsActivity> getPatientActivityByPatientId(int patientId) {
+        return patientsActivityRepository.findByPatientId(patientId);
     }
 
     public void removeAllPatientsActivitiesForPatientId(int patientId) {

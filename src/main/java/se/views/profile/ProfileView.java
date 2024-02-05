@@ -10,7 +10,6 @@ import jakarta.annotation.security.PermitAll;
 import se.db.model.User;
 import se.security.SecurityService;
 import se.views.MainLayout;
-
 @PermitAll
 @PageTitle("Profile")
 @Route(value = "profile", layout = MainLayout.class)
