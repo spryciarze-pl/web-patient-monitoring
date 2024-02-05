@@ -10,6 +10,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.db.model.DoctorsActivity;
@@ -17,6 +18,7 @@ import se.db.model.PatientsActivity;
 import se.db.service.DbService;
 import se.dto.DoctorsActivityDto;
 
+import javax.print.Doc;
 import java.time.LocalDateTime;
 
 public class ActivityActionDialog extends Dialog {
@@ -52,7 +54,11 @@ public class ActivityActionDialog extends Dialog {
             case "Take medicine":
                 createConfirmMedicineModal(doctorsActivity);
                 break;
+            case "Request from doctor":
+                createMiscellaneousModal(doctorsActivity);
+                break;
         }
+        prepareLayout();
     }
 
     private void prepareLayout() {
@@ -70,6 +76,12 @@ public class ActivityActionDialog extends Dialog {
         textField.setHelperText(helperText);
         textField.setAllowedCharPattern("[0-9.]");
         textField.setWidth("50%");
+
+        TextField descriptionTextFiled = new TextField();
+        descriptionTextFiled.setValue(activity.getDescription());
+        descriptionTextFiled.setLabel("Doctors description");
+        descriptionTextFiled.setReadOnly(true);
+        descriptionTextFiled.setWidthFull();
 
         Button button = new Button("Submit");
         button.addClickListener(event -> {
@@ -93,9 +105,11 @@ public class ActivityActionDialog extends Dialog {
         button.getStyle().set("margin-top", "35px");
 
         elementLayout = new HorizontalLayout(textField, button);
-        mainLayout.add(title, elementLayout);
-
-        prepareLayout();
+        mainLayout.add(title);
+        if (!activity.getDescription().isEmpty()) {
+            mainLayout.add(descriptionTextFiled);
+        }
+        mainLayout.add(elementLayout);
     }
 
     private void createPrescriptionModal() {
@@ -149,8 +163,57 @@ public class ActivityActionDialog extends Dialog {
         button.setWidth("50%");
 
         mainLayout.add(title, checkbox, elementLayout, button);
-        prepareLayout();
-
     }
 
+    private void createMiscellaneousModal(DoctorsActivity activity) {
+        H2 title = new H2("Activity Description");
+        title.setHeight("10%");
+
+        TextArea replyArea = new TextArea();
+        replyArea.setWidthFull();
+        replyArea.setHeightFull();
+
+        TextArea descriptionArea = new TextArea();
+        descriptionArea.setWidthFull();
+        descriptionArea.setHeightFull();
+        descriptionArea.setReadOnly(true);
+
+        Button button = new Button("Submit descpription", event -> {
+
+            PatientsActivity patientsActivity = new PatientsActivity();
+
+            patientsActivity.setPatientId(activity.getPatientId());
+            patientsActivity.setTime(LocalDateTime.now());
+            patientsActivity.setDoctorsRequestId(activity.getId());
+            patientsActivity.setResult(replyArea.getValue());
+            patientsActivity.setType(activity.getType());
+
+            dbService.saveNewPatientActivity(patientsActivity);
+            dbService.setDoctorsActivityAsComplete(patientsActivity.getDoctorsRequestId());
+
+            activityGrid.setItems(dbService.getActivityDtoByPatientId(activity.getPatientId()));
+            close();
+            Notification.show("Reply saved");
+
+        });
+        button.setHeight("10%");
+
+        HorizontalLayout descriptionAreaLayout = new HorizontalLayout(descriptionArea);
+        descriptionAreaLayout.setWidthFull();
+        descriptionAreaLayout.setHeight("40%");
+
+        HorizontalLayout replyAreaLayout = new HorizontalLayout(replyArea);
+        replyAreaLayout.setWidthFull();
+        replyAreaLayout.setHeight("40%");
+
+        VerticalLayout mainLayout = new VerticalLayout(title, descriptionAreaLayout, replyAreaLayout, button);
+        mainLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        mainLayout.setHeightFull();
+        mainLayout.setWidthFull();
+
+        add(mainLayout);
+        setWidth("60%");
+        setHeight("60%");
+
+    }
 }

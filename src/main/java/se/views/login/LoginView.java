@@ -1,13 +1,12 @@
 package se.views.login;
 
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
-import se.security.UserDetailsService;
+import se.secuirty.UserDetailsService;
 
 @Route("login")
 @PageTitle("Login")
@@ -32,14 +31,9 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             userDetailsService.loadUserByUsername(event.getUsername());
         });
 
-        add(new H1("MEDIO"), login);
+        add(new H1("Test Application"), login);
 
-        Button registerButton = new Button("Register new User");
-        registerButton.addClickListener(e -> {
-            registerButton.getUI().ifPresent(ui -> ui.navigate("register"));
-        });
 
-        add(registerButton);
     }
 
     @Override
