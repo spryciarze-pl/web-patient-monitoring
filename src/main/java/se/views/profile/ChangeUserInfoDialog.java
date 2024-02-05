@@ -14,6 +14,7 @@ import se.db.model.User;
 //import se.db.service.DbService;
 
 public class ChangeUserInfoDialog extends Dialog {
+
     //@Autowired
     //DbService dbService;
     private TextField nameField = new TextField("Name");
@@ -43,6 +44,9 @@ public class ChangeUserInfoDialog extends Dialog {
                 if(!this.repeatPasswordField.isEmpty() && this.repeatPasswordField.getValue().equals(this.passwordField.getValue())) {
                     Password newPassword = new Password(this.passwordField.getValue());
                     //currentUser.setPasswordId(dbService.savePasswordAndGetNewId(newPassword));
+
+                    //No new password, we edit the already existing one
+                    //Example: DoctorsActivityRepository markDoctorsActivityAsComplete
                 }
                 else{
                     //todo message informing that the repeated password needs to be the same as the password
@@ -54,6 +58,7 @@ public class ChangeUserInfoDialog extends Dialog {
                 currentUser.setPhone(this.phoneField.getValue());
 
             //todo dbService.changeUserInfo(currentUser);
+            //userRepository.save(user)
             close();
             UI.getCurrent().getPage().reload();
         });
