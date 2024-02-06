@@ -11,7 +11,7 @@ import lombok.Getter;
 
 public class ActivityDescriptionDialog extends Dialog {
 
-    private final TextArea textArea;
+    private TextArea textArea;
 
     public ActivityDescriptionDialog() {
 
@@ -45,4 +45,7 @@ public class ActivityDescriptionDialog extends Dialog {
         return textArea.getValue();
     }
 
+    public void clear() {
+        textArea.clear();
+    }
 }

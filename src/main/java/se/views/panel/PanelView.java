@@ -139,6 +139,7 @@ public class PanelView extends VerticalLayout {
                 } else {
                     DoctorsActivity doctorsActivity = new DoctorsActivity(currentUser.getId(), patientsCombobox.getValue().getId(),
                             activityCombobox.getValue().getValue(), activityDescriptionDialog.getDescription(), LocalDateTime.now(), dateTimePicker.getValue(), false);
+                    activityDescriptionDialog.clear();
                     dbService.saveNewDoctorsActivity(doctorsActivity);
                     Notification.show("Created new Activity");
                     activityCombobox.clear();
@@ -243,7 +244,7 @@ public class PanelView extends VerticalLayout {
 
         activityGrid.addColumn(DoctorsActivityDto::getActivityType).setHeader("Type");
         activityGrid.addColumn(column -> MedioUtils.formatDateTimeDefault(column.getDeadline())).setHeader("Deadline");
-        activityGrid.addColumn(column -> MedioUtils.getReaminingDuration(column.getLocalDateTime())).setHeader("Remaining");
+        activityGrid.addColumn(column -> MedioUtils.getReaminingDuration(column.getDeadline())).setHeader("Remaining");
         activityGrid.addComponentColumn(component -> {
             Button button = new Button("Perform activity", event -> {
                 ActivityActionDialog modal = new ActivityActionDialog(dbService, component, activityGrid);
@@ -322,7 +323,10 @@ public class PanelView extends VerticalLayout {
 
         activityDetailsLayout.add(activityCombobox, addDescriptionButton, selectActivity);
 
-        add(activityDetailsLayout);
+        if(dbService.patientHasDoctor(currentUser.getId())) {
+            add(activityDetailsLayout);
+        }
+
         rightSideLayout.add(activityGrid);
 
     }
