@@ -27,10 +27,4 @@ public class Assignment {
 
     public Assignment() {
     }
-
-    public Assignment(Integer patientId, Integer doctorId) {
-        this.patientId = patientId;
-        this.doctorId = doctorId;
-    }
-
 }

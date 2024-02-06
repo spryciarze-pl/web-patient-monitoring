@@ -22,6 +22,7 @@ import se.enums.AppointmentType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+
 public class MeetingSchedulerDialog extends Dialog {
 
     @Autowired
@@ -50,7 +51,6 @@ public class MeetingSchedulerDialog extends Dialog {
         setWidth("70%");
         setHeight("70%");
         add(mainLayout);
-
     }
 
     private void createViewForDoctor() {
@@ -139,7 +139,6 @@ public class MeetingSchedulerDialog extends Dialog {
     }
 
     private void createViewForPatient() {
-
         H2 title = new H2("Appointment Description");
         title.setHeight("10%");
 
@@ -217,7 +216,6 @@ public class MeetingSchedulerDialog extends Dialog {
         });
 
         mainLayout.add(title, elementLayout, textAreaLayout, button);
-
     }
 
 }

@@ -1,5 +1,6 @@
 package se.views.appointment;
 
+
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
@@ -21,12 +22,13 @@ import se.views.appointment.dialogs.RejectAppointmentDialog;
 import se.views.appointment.dialogs.ShowAppointmentStringDialog;
 
 import java.util.List;
+import se.views.MainLayout;
 
 @PageTitle("Appointment")
 @Route(value = "appointment", layout = MainLayout.class)
 @PermitAll
 public class AppointmentView extends VerticalLayout {
-
+  
     @Autowired
     DbService dbService;
 

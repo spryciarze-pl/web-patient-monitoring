@@ -86,8 +86,4 @@ public class User {
         this.clinic = clinic;
         this.specialization = specialization;
     }
-
-    public String getFullName() {
-        return this.name + " " + this.surname;
-    }
 }
