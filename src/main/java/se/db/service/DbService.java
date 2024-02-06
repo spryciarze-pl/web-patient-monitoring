@@ -33,6 +33,8 @@ public class DbService {
     PasswordRepository passwordRepository;
     @Autowired
     PrescriptionRepository prescriptionRepository;
+    @Autowired
+    AppointmentRepository appointmentRepository;
 
     public boolean patientHasDoctor(int patientId) {
         return assignmentRepository.findByPatientId(patientId) != null;
@@ -154,6 +156,30 @@ public class DbService {
 
     public void removePatientActivityByDoctorsRequestId(int doctorsRequestId) {
         patientsActivityRepository.deleteByDoctorsRequestId(doctorsRequestId);
+    }
+
+    public List<Appointment> getAppointmentsByDoctorIdAndDrive(int doctorId, boolean doctorDriven) {
+        return appointmentRepository.findByDoctorIdAndDoctorDriven(doctorId, doctorDriven);
+    }
+
+    public List<Appointment> getAppointmentsByPatientIdAndDrive(int patientId, boolean doctorDriven) {
+        return appointmentRepository.findByPatientIdAndDoctorDriven(patientId, doctorDriven);
+    }
+
+    public void saveNewAppointment(Appointment appointment) {
+        appointmentRepository.save(appointment);
+    }
+
+    public void removeAppointmentById(int appointmentId) {
+        appointmentRepository.deleteById((long) appointmentId);
+    }
+
+    public void setAppointmentConfirmedById(int appointmentId) {
+        appointmentRepository.markAppointmentAsConfirmed(appointmentId);
+    }
+
+    public void setAppointmentInvalidByIdAndAddReason(int appointmentId, String reason) {
+        appointmentRepository.markAppointmentAsInvalid(appointmentId, reason);
     }
 
 }
