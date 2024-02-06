@@ -18,7 +18,6 @@ import se.db.model.PatientsActivity;
 import se.db.service.DbService;
 import se.dto.DoctorsActivityDto;
 
-import javax.print.Doc;
 import java.time.LocalDateTime;
 
 public class ActivityActionDialog extends Dialog {
@@ -216,4 +215,5 @@ public class ActivityActionDialog extends Dialog {
         setHeight("60%");
 
     }
+
 }

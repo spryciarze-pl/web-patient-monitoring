@@ -17,7 +17,7 @@ import se.views.login.LoginView;
 public class SecurityConfiguration extends VaadinWebSecurity {
 
     @Autowired
-    UserDetailsService userDetailsService;
+    se.secuirty.UserDetailsService userDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

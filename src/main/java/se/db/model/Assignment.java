@@ -6,12 +6,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.GenerationType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
 
 @Entity
 @Table(name = "assignments", schema = "public")
 @Data
+@AllArgsConstructor
 public class Assignment {
 
     @Id
@@ -26,5 +27,10 @@ public class Assignment {
     private Integer patientId;
 
     public Assignment() {
+    }
+
+    public Assignment(Integer patientId, Integer doctorId) {
+        this.patientId = patientId;
+        this.doctorId = doctorId;
     }
 }
