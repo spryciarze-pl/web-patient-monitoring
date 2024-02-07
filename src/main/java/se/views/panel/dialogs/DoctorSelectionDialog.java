@@ -17,15 +17,14 @@ public class DoctorSelectionDialog extends Dialog {
     @Autowired
     DbService dbService;
 
-    public DoctorSelectionDialog(User currentUser, List<User> doctorList, DbService dbService) {
+    public DoctorSelectionDialog(User currentUser, DbService dbService) {
 
         this.dbService = dbService;
         Grid<User> grid = new Grid<>(User.class, false);
 
-        grid.setItems(doctorList);
-        grid.addColumn(User::getName).setHeader("First Name");
-        grid.addColumn(User::getSurname).setHeader("Surname");
-        grid.addColumn(User::getSpecialization).setHeader("Specialisation");
+        grid.setItems(dbService.getAvailableDoctors());
+        grid.addColumn(User::getFullName).setHeader("Name");
+        grid.addColumn(column -> column.getSpecialization() != null ? column.getSpecialization().getName() : "").setHeader("Specialisation");
         grid.addColumn(column -> column.getClinic() != null ? column.getClinic().getName() : "No clinic selected").setHeader("Clinic");
         grid.addComponentColumn(user -> {
             Button button = new Button("Select this Doctor");

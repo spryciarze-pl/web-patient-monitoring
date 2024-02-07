@@ -13,6 +13,7 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.db.model.Clinic;
+import se.db.model.PatientsLimit;
 import se.db.model.Specialization;
 import se.db.model.User;
 import se.db.service.DbService;
@@ -31,17 +32,27 @@ public class ChangeUserInfoDialog extends Dialog {
     private ComboBox<Clinic> clinicComboBox = new ComboBox<>("Clinic");
     private ComboBox<Specialization> specializationComboBox = new ComboBox<>("Specialization");
 
-    public ChangeUserInfoDialog(DbService dbService, User currentUser){
+    private PatientsLimit patientsLimit;
+
+    private TextField patientsLimitField = new TextField("Patients Limit");
+
+    public ChangeUserInfoDialog(DbService dbService, User currentUser) {
         this.dbService = dbService;
+        this.setPlaceholders("(unchanged)");
         VerticalLayout dialogLayout = new VerticalLayout(this.nameField, this.surnameField, this.peselField, this.passwordField,
-                                                    this.repeatPasswordField, this.emailField, this.phoneField, this.clinicComboBox);
+                this.repeatPasswordField, this.emailField, this.phoneField, this.clinicComboBox);
         clinicComboBox.setItemLabelGenerator(Clinic::getName);
         clinicComboBox.setItems(dbService.getAllClinics());
+
         specializationComboBox.setItemLabelGenerator(Specialization::getName);
         specializationComboBox.setItems(dbService.getAllSpecializations());
         specializationComboBox.setWidthFull();
-        if(currentUser.getRoleId().equals(RoleEnum.DOCTOR.getRoleDbVal())) {
+
+
+        if (currentUser.getRoleId().equals(RoleEnum.DOCTOR.getRoleDbVal())) {
             dialogLayout.add(this.specializationComboBox);
+            dialogLayout.add(this.patientsLimitField);
+            patientsLimit = dbService.getDoctorPatientsLimitByDoctorId(currentUser.getId());
         }
         dialogLayout.setPadding(false);
         dialogLayout.setSpacing(false);
@@ -50,35 +61,38 @@ public class ChangeUserInfoDialog extends Dialog {
         this.setHeaderTitle("Change your data");
         this.add(dialogLayout);
         Button saveButton = new Button("Save changes", e -> {
-            if(!this.nameField.isEmpty())
+            if (!this.nameField.isEmpty())
                 currentUser.setName(this.nameField.getValue());
-            if(!this.surnameField.isEmpty())
+            if (!this.surnameField.isEmpty())
                 currentUser.setSurname(this.surnameField.getValue());
-            if(!this.peselField.isEmpty())
+            if (!this.peselField.isEmpty())
                 currentUser.setPin(this.peselField.getValue());
-            if(!this.emailField.isEmpty())
+            if (!this.emailField.isEmpty())
                 currentUser.setMail(this.emailField.getValue());
-            if(!this.phoneField.isEmpty())
+            if (!this.phoneField.isEmpty())
                 currentUser.setPhone(this.phoneField.getValue());
-            if(!this.clinicComboBox.isEmpty())
+            if (!this.clinicComboBox.isEmpty())
                 currentUser.setClinic(dbService.getClinicById(this.clinicComboBox.getValue().getId()));
-            if(!this.specializationComboBox.isEmpty())
+            if (!this.specializationComboBox.isEmpty())
                 currentUser.setSpecialization(dbService.getSpecializationById(this.specializationComboBox.getValue().getId()));
+            if (!this.patientsLimitField.isEmpty()) {
+                patientsLimit.setPLimit(Integer.valueOf(patientsLimitField.getValue()));
+                dbService.updateDoctorsPatientLimit(patientsLimit.getPLimit(), patientsLimit.getDoctorId());
+            }
 
-            if(!this.passwordField.isEmpty()){
-                if(!this.repeatPasswordField.isEmpty() && this.repeatPasswordField.getValue().equals(this.passwordField.getValue())) {
+            if (!this.passwordField.isEmpty()) {
+                if (!this.repeatPasswordField.isEmpty() && this.repeatPasswordField.getValue().equals(this.passwordField.getValue())) {
                     dbService.changePassword(currentUser.getPasswordId(), this.passwordField.getValue());
                     dbService.saveNewUser(currentUser);
                     close();
                     UI.getCurrent().getPage().reload();
-                }
-                else{
+                    Notification.show("Data changed");
+                } else {
                     Notification notification = Notification.show("Password must be the same as repeated password");
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.setDuration(1000);
                 }
-            }
-            else {
+            } else {
                 dbService.saveNewUser(currentUser);
                 close();
                 UI.getCurrent().getPage().reload();
@@ -87,5 +101,21 @@ public class ChangeUserInfoDialog extends Dialog {
         Button cancelButton = new Button("Cancel", e -> close());
         this.getFooter().add(cancelButton);
         this.getFooter().add(saveButton);
+    }
+
+    private void setPlaceholders(String placeholder) {
+        this.nameField.setPlaceholder(placeholder);
+        this.surnameField.setPlaceholder(placeholder);
+        this.peselField.setPlaceholder(placeholder);
+        this.peselField.setAllowedCharPattern("[0-9-]");
+        this.passwordField.setPlaceholder(placeholder);
+        this.repeatPasswordField.setPlaceholder(placeholder);
+        this.emailField.setPlaceholder(placeholder);
+        this.phoneField.setPlaceholder(placeholder);
+        this.phoneField.setAllowedCharPattern("[0-9()+-]");
+        this.clinicComboBox.setPlaceholder(placeholder);
+        this.specializationComboBox.setPlaceholder(placeholder);
+        this.patientsLimitField.setPlaceholder(placeholder);
+        this.patientsLimitField.setAllowedCharPattern("[0-9]");
     }
 }

@@ -268,7 +268,7 @@ public class PanelView extends VerticalLayout {
         } else {
             Button selectDoctorButton = new Button("Select your Doctor");
             selectDoctorButton.addClickListener(event -> {
-                DoctorSelectionDialog dialog = new DoctorSelectionDialog(this.currentUser, dbService.getAvailableDoctors(), dbService);
+                DoctorSelectionDialog dialog = new DoctorSelectionDialog(this.currentUser, dbService);
                 dialog.open();
             });
             leftSideLayout.add(selectDoctorButton);
@@ -354,6 +354,21 @@ public class PanelView extends VerticalLayout {
     }
 
     private void createAdminView() {
+        Grid<User> userGrid = new Grid<>(User.class, false);
+        userGrid.addColumn(User::getFullName).setHeader("Full name");
+        userGrid.addColumn(column -> column.getSpecialization() != null ? column.getSpecialization().getName() : "Not specified").setHeader("Specialisation");
+        userGrid.addColumn(column -> column.getClinic() != null ? column.getClinic().getName() : "Not specified").setHeader("Clinic");
+        userGrid.addComponentColumn(column -> {
+            Button button = new Button("Confirm", event -> {
+                dbService.setUserAsConfirmed(column.getId());
+                userGrid.setItems(dbService.getUnconfirmedDoctors());
+                Notification.show("User confirmed");
+            });
+            return button;
+        }).setHeader("Action");
+        userGrid.setItems(dbService.getUnconfirmedDoctors());
 
+
+        add(userGrid);
     }
 }

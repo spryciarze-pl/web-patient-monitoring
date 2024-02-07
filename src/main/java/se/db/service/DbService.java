@@ -8,8 +8,10 @@ import se.db.model.*;
 import se.db.repository.*;
 import se.dto.DoctorsActivityDto;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +37,8 @@ public class DbService {
     PrescriptionRepository prescriptionRepository;
     @Autowired
     AppointmentRepository appointmentRepository;
+    @Autowired
+    PatientsLimitRepository patientsLimitRepository;
 
     public boolean patientHasDoctor(int patientId) {
         return assignmentRepository.findByPatientId(patientId) != null;
@@ -47,6 +51,14 @@ public class DbService {
     public List<User> getPatientsAssignedToDoctor(int doctorId) {
         return assignmentRepository.findByDoctorId(doctorId).stream()
                 .map(id -> userRepository.findById(id.getPatientId())).toList();
+    }
+
+    public void setUserAsConfirmed(int userId) {
+        userRepository.confirmUserById(userId);
+    }
+
+    public List<User> getUnconfirmedDoctors() {
+        return userRepository.findByConfirmedAndRoleId(false, 2);
     }
 
     public List<DoctorsActivityDto> getActivityDtoByDoctorId(int doctorId) {
@@ -90,11 +102,21 @@ public class DbService {
     }
 
     public List<User> getAvailableDoctors() {
-        List<Integer> availableDoctorsIds = assignmentRepository.findDoctorsWithMoreThan5Assignments();
-        List<User> avaibleDoctors = userRepository.findByRoleId(2);
+        List<User> availableDoctors = userRepository.findByRoleId(2);
+        availableDoctors = availableDoctors.stream().filter(doctor -> {
+            PatientsLimit doctorLimit = patientsLimitRepository.findByDoctorId(doctor.getId());
+            if(doctorLimit == null) {
+                 doctorLimit = new PatientsLimit(doctor.getId(), 5);
+                patientsLimitRepository.save(doctorLimit);
+            }
+            int limit = doctorLimit.getPLimit();
+            int doctorCurrent = assignmentRepository.countOccurrencesByDoctorId(doctor.getId());
+            return doctor.isConfirmed() && (doctorCurrent < limit);
 
-        avaibleDoctors = avaibleDoctors.stream().filter(user -> !availableDoctorsIds.contains(user.getId())).collect(Collectors.toList());
-        return avaibleDoctors;
+        }).toList();
+        List<User> ret = new ArrayList<>(availableDoctors);
+        ret.sort(Comparator.comparing(User::getName));
+        return ret;
     }
 
     public void removeDoctorsActivity(int activityId) {
@@ -186,6 +208,14 @@ public class DbService {
 
     public void setAppointmentInvalidByIdAndAddReason(int appointmentId, String reason) {
         appointmentRepository.markAppointmentAsInvalid(appointmentId, reason);
+    }
+
+    public PatientsLimit getDoctorPatientsLimitByDoctorId(int doctorId) {
+        return patientsLimitRepository.findByDoctorId(doctorId);
+    }
+
+    public void updateDoctorsPatientLimit(int limit, int doctorId) {
+        patientsLimitRepository.updateDoctorsPatientLimit(limit, doctorId);
     }
 
 }

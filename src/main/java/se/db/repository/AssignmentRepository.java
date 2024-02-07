@@ -18,6 +18,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     @Transactional
     void deleteByPatientId(Integer id);
 
-    @Query("SELECT a.doctorId FROM Assignment a GROUP BY a.doctorId HAVING COUNT(a.doctorId) > 5")
-    List<Integer> findDoctorsWithMoreThan5Assignments();
+    @Query("SELECT COUNT(a) FROM Assignment a WHERE a.doctorId = :doctorId")
+    Integer countOccurrencesByDoctorId(Integer doctorId);
 }
