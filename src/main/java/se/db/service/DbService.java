@@ -109,14 +109,20 @@ public class DbService {
         return clinicRepository.findAll();
     }
 
+    public Clinic getClinicById(Integer clinicId) { return clinicRepository.findById(clinicId); }
+
     public List<Specialization> getAllSpecializations() {
         return specializationRepository.findAll();
     }
+
+    public Specialization getSpecializationById(Integer specializationId) { return specializationRepository.findById(specializationId); }
 
     public Integer savePasswordAndGetNewId(Password password) {
         passwordRepository.save(password);
         return passwordRepository.findByHashedPassword(password.getHashedPassword()).getId();
     }
+
+    public void changePassword(Integer passwordId, String newPassword){ passwordRepository.updatePassword(passwordId, newPassword);}
 
     public void saveNewUser(User user) {
         userRepository.save(user);
