@@ -13,11 +13,13 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.db.model.DoctorsActivity;
+import se.db.model.PatientsActivity;
 import se.db.model.Prescription;
 import se.db.model.User;
 import se.db.service.DbService;
 import se.dto.DoctorsActivityDto;
 import se.enums.DoctorsActivityEnum;
+import se.enums.PatientsActivityEnum;
 import se.security.SecurityService;
 import se.utils.MedioUtils;
 import se.views.MainLayout;
@@ -119,7 +121,7 @@ public class PanelView extends VerticalLayout {
 
         Button selectActivity = new Button("Select activity", event -> {
 
-            if(activityCombobox.getValue() == DoctorsActivityEnum.PRESCRIPTION) {
+            if (activityCombobox.getValue() == DoctorsActivityEnum.PRESCRIPTION) {
                 if (patientsCombobox.isEmpty()) {
                     Notification.show("Please select all the boxes to create activity!");
                 } else {
@@ -137,7 +139,8 @@ public class PanelView extends VerticalLayout {
                 } else {
                     DoctorsActivity doctorsActivity = new DoctorsActivity(currentUser.getId(), patientsCombobox.getValue().getId(),
                             activityCombobox.getValue().getValue(), activityDescriptionDialog.getDescription(), LocalDateTime.now(), dateTimePicker.getValue(), false);
-                    dbService.addNewDoctorsActivity(doctorsActivity);
+                    activityDescriptionDialog.clear();
+                    dbService.saveNewDoctorsActivity(doctorsActivity);
                     Notification.show("Created new Activity");
                     activityCombobox.clear();
                     patientsCombobox.clear();
@@ -149,7 +152,7 @@ public class PanelView extends VerticalLayout {
         });
 
         activityCombobox.addValueChangeListener(value -> {
-            if(value.getValue() == DoctorsActivityEnum.PRESCRIPTION) {
+            if (value.getValue() == DoctorsActivityEnum.PRESCRIPTION) {
                 activityDetailsLayout.remove(dateTimePicker);
                 activityDetailsLayout.remove(addDescriptionButton);
             } else {
@@ -203,11 +206,11 @@ public class PanelView extends VerticalLayout {
         Grid<DoctorsActivityDto> activityGrid = new Grid<>(DoctorsActivityDto.class, false);
         activityGrid.addColumn(DoctorsActivityDto::getFullName).setHeader("Name");
         activityGrid.addColumn(DoctorsActivityDto::getActivityType).setHeader("Type");
-        activityGrid.addColumn(column -> MedioUtils.formatDateTimeDefault(column.getLocalDateTime())).setHeader("Deadline");
+        activityGrid.addColumn(column -> MedioUtils.formatDateTimeDefault(column.getDeadline())).setHeader("Deadline");
         activityGrid.addComponentColumn(activity -> {
 
             Button button = new Button("Show reply");
-            if(!activity.isCompleted()) {
+            if (!activity.isCompleted()) {
                 button.setEnabled(false);
                 button.setTooltipText("Activity is not yet completed");
             } else {
@@ -240,8 +243,8 @@ public class PanelView extends VerticalLayout {
         Grid<DoctorsActivityDto> activityGrid = new Grid<>(DoctorsActivityDto.class, false);
 
         activityGrid.addColumn(DoctorsActivityDto::getActivityType).setHeader("Type");
-        activityGrid.addColumn(column -> MedioUtils.formatDateTimeDefault(column.getLocalDateTime())).setHeader("Deadline");
-        activityGrid.addColumn(column -> MedioUtils.getReaminingDuration(column.getLocalDateTime())).setHeader("Remaining");
+        activityGrid.addColumn(column -> MedioUtils.formatDateTimeDefault(column.getDeadline())).setHeader("Deadline");
+        activityGrid.addColumn(column -> MedioUtils.getReaminingDuration(column.getDeadline())).setHeader("Remaining");
         activityGrid.addComponentColumn(component -> {
             Button button = new Button("Perform activity", event -> {
                 ActivityActionDialog modal = new ActivityActionDialog(dbService, component, activityGrid);
@@ -273,13 +276,64 @@ public class PanelView extends VerticalLayout {
 
         Grid<DoctorsActivityDto> activityGrid = createDoctorsActivityDtoGridForPatient();
 
+        activityDetailsLayout = new HorizontalLayout();
+        activityDetailsLayout.setWidthFull();
+
+        ComboBox<PatientsActivityEnum> activityCombobox = new ComboBox<>("Patients Activity");
+        activityCombobox.setItems(PatientsActivityEnum.values());
+        activityCombobox.setItemLabelGenerator(PatientsActivityEnum::getValue);
+
+        ActivityDescriptionDialog activityDescriptionDialog = new ActivityDescriptionDialog();
+        Button addDescriptionButton = new Button("Add description", event -> {
+            activityDescriptionDialog.open();
+        });
+
+        Button selectActivity = new Button("Select Activity", event -> {
+            if(activityCombobox.isEmpty()) {
+                Notification.show("Please select all the boxes to create activity!");
+            } else if (activityDescriptionDialog.getDescription().isEmpty()) {
+                Notification.show("Please enter a description for the action");
+            } else {
+
+                DoctorsActivity doctorsActivity = new DoctorsActivity();
+                doctorsActivity.setActivityTime(LocalDateTime.now());
+                doctorsActivity.setPatientId(currentUser.getId());
+                doctorsActivity.setDoctorId(dbService.getPatientsDoctor(currentUser.getId()).getId());
+                doctorsActivity.setType(activityCombobox.getValue().getValue());
+                doctorsActivity.setDeadlineTime(LocalDateTime.now());
+                doctorsActivity.setCompleted(true);
+                doctorsActivity.setDescription("Description");
+
+                int idx = dbService.saveNewDoctorsActivity(doctorsActivity).getId();
+
+                PatientsActivity patientsActivity = new PatientsActivity();
+                patientsActivity.setPatientId(currentUser.getId());
+                patientsActivity.setTime(LocalDateTime.now());
+                patientsActivity.setDoctorsRequestId(idx);
+                patientsActivity.setResult(activityDescriptionDialog.getDescription());
+                patientsActivity.setType(activityCombobox.getValue().getValue());
+
+                dbService.saveNewPatientActivity(patientsActivity);
+                Notification.show("Activity saved");
+            }
+        });
+
+        addDescriptionButton.getStyle().set("margin-top", "35px");
+        selectActivity.getStyle().set("margin-top", "35px");
+
+        activityDetailsLayout.add(activityCombobox, addDescriptionButton, selectActivity);
+
+        if(dbService.patientHasDoctor(currentUser.getId())) {
+            add(activityDetailsLayout);
+        }
+
         rightSideLayout.add(activityGrid);
 
     }
 
     private void createWelcomeMessage() {
         H2 welcomeMessage = new H2("Hello " + currentUser.getName());
-        H3 currentDate = new H3("Today is: " + LocalDate.now().toString());
+        H3 currentDate = new H3("Today is: " + LocalDate.now());
         currentDate.getStyle().set("margin", "15px");
 
         detailsLayout = new VerticalLayout(welcomeMessage, currentDate);

@@ -13,7 +13,6 @@ import se.db.service.DbService;
 import se.enums.RoleEnum;
 import se.security.SecurityService;
 import se.views.MainLayout;
-
 @PermitAll
 @PageTitle("Profile")
 @Route(value = "profile", layout = MainLayout.class)

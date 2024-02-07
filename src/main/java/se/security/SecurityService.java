@@ -12,8 +12,8 @@ public class SecurityService {
         this.authenticationContext = authenticationContext;
     }
 
-    public CustomUserDetails getAuthenticatedUser() {
-        return authenticationContext.getAuthenticatedUser(CustomUserDetails.class).get();
+    public se.secuirty.CustomUserDetails getAuthenticatedUser() {
+        return authenticationContext.getAuthenticatedUser(se.secuirty.CustomUserDetails.class).get();
     }
 
     public void logout() {

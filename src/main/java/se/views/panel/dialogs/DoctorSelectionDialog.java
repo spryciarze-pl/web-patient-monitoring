@@ -25,6 +25,7 @@ public class DoctorSelectionDialog extends Dialog {
         grid.setItems(doctorList);
         grid.addColumn(User::getName).setHeader("First Name");
         grid.addColumn(User::getSurname).setHeader("Surname");
+        grid.addColumn(User::getSpecialization).setHeader("Specialisation");
         grid.addColumn(column -> column.getClinic() != null ? column.getClinic().getName() : "No clinic selected").setHeader("Clinic");
         grid.addComponentColumn(user -> {
             Button button = new Button("Select this Doctor");

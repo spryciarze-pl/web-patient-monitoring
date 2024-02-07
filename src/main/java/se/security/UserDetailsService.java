@@ -1,4 +1,4 @@
-package se.security;
+package se.secuirty;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +36,7 @@ public class UserDetailsService implements org.springframework.security.core.use
 
     @Override
     public UserDetails loadUserByUsername(String mail) {
+
 
         User user = userRepository.findByMail(mail);
         Password password = passwordRepository.findById(user.getPasswordId());
